@@ -1,10 +1,10 @@
 # GPT 2.0 Assignment — TinyGPT on *Pride and Prejudice*
 
-## 1. 프로젝트 개요
+## 1. 개요
 
-이 프로젝트는 수업에서 제공된 Notebook 1–6의 구현 흐름을 바탕으로, **character-level decoder-only Transformer(TinyGPT)**를 구현하고 학습한 과제입니다.
+이 프로젝트는 수업에서 제공된 Notebook 1–6의 구현 흐름을 바탕으로, **TinyGPT**를 구현하고 학습한 과제입니다.
 
-기존 실습 데이터인 Tiny Shakespeare 대신 Jane Austen의 소설 **_Pride and Prejudice_**를 사용했습니다. 이 모델은 OpenAI의 공식 GPT-2 전체 모델을 재현한 것이 아니라, GPT의 핵심 구성 요소를 작은 규모로 구현한 교육용 모델입니다.
+기존 실습 데이터인 Tiny Shakespeare 대신 Jane Austen의 소설 **_Pride and Prejudice_**를 사용했습니다. 
 
 실행 코드와 전체 출력은 [`GPT_2_0_Pride_and_Prejudice.ipynb`](GPT_2_0_Pride_and_Prejudice.ipynb)에서 확인할 수 있습니다.
 
@@ -59,10 +59,10 @@ It is a truth universally acknowledged ...
 | 지표 | 결과 |
 |---|---:|
 | Epoch 0 train loss | **2.6625** |
-| Epoch 99 train loss | **1.1058** |
-| Loss 감소량 | **1.5567** |
+| Epoch 99 train loss | **1.1061** |
+| Loss 감소량 | **1.5564** |
 
-Train loss가 2.6625에서 1.1058로 전반적으로 감소했습니다. 이는 모델이 데이터셋의 문자 배열, 영어 단어 형태, 띄어쓰기, 구두점 및 대화문 패턴을 학습했음을 보여줍니다.
+Train loss가 2.6625에서 1.1061로 전반적으로 감소했습니다. 이는 모델이 데이터셋의 문자 배열, 영어 단어 형태, 띄어쓰기, 구두점 및 대화문 패턴을 학습했음을 보여줍니다.
 
 이 과제에서는 수업 노트북의 학습 방식을 유지하여 **train loss**를 결과로 제시했습니다. 별도의 validation loss는 계산하지 않았습니다.
 
@@ -74,14 +74,13 @@ Train loss가 2.6625에서 1.1058로 전반적으로 감소했습니다. 이는 
 생성 결과 일부:
 
 ```text
-Elizabeth and /*.
+Elizabeth herself out Jane himself to be sure. The warmth of Elizabeth
 
-[Illustration:
+[Illustration]
 
-“This was now concerned as you?”
-
-“I am much for obliged to him. His praises manners on the other,” said her sister,
-“But connected with greater which had from the aracter a hundress ...
+A restraint benefit of the all. The hint ill are to what had longerness in
+summer; for, that they were knowledged to conciliation of whom he
+can communicate is to Mr. Bingley’s being just can boaster.” ...
 ```
 
 전체 생성 결과는 [`generated_sample.txt`](generated_sample.txt)와 노트북의 마지막 출력에서 확인할 수 있습니다.
