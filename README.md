@@ -4,7 +4,7 @@
 
 이 프로젝트는 수업에서 제공된 Notebook 1–6의 구현 흐름을 바탕으로, **TinyGPT**를 구현하고 학습한 과제입니다.
 
-기존 실습 데이터인 Tiny Shakespeare 대신 Jane Austen의 소설 **_Pride and Prejudice_를 사용했습니다. 
+기존 실습 데이터인 Tiny Shakespeare 대신 Jane Austen의 소설 _Pride and Prejudice_를 사용했습니다. 
 
 실행 코드와 전체 출력은 [`GPT_2_0_Pride_and_Prejudice.ipynb`](GPT_2_0_Pride_and_Prejudice.ipynb)에서 확인할 수 있습니다.
 
