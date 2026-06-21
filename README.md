@@ -23,6 +23,17 @@
 It is a truth universally acknowledged ...
 ```
 
+```python
+start_phrase = "It is a truth universally acknowledged"
+end_marker = "*** END OF THE PROJECT GUTENBERG EBOOK PRIDE AND PREJUDICE ***"
+text = raw_text[start_idx:end_idx].strip()
+```
+
+소설 본문 안에 포함된 `[Illustration]` 등의 편집 표시는 별도로 제거하지 않았습니다.
+
+---
+
+
 ## 3. 모델 구조
 
 모델은 다음 구성 요소를 포함합니다.
@@ -37,6 +48,18 @@ It is a truth universally acknowledged ...
 - Dropout
 - 4개의 Transformer block
 - 다음 문자를 예측하는 language-model head
+
+모형의 입력은 연속된 64개 문자이고, 각 위치에서 바로 다음 문자를 예측하도록 cross-entropy loss로 학습합니다.
+
+모형 동작 확인 결과는 다음과 같습니다.
+
+```text
+logits.shape: torch.Size([64, 64, 86])
+```
+
+이는 한 batch에 64개 문장 조각이 들어가고, 각 조각의 64개 위치마다 86개 문자에 대한 예측값을 출력한다는 의미입니다.
+
+---
 
 ## 4. 학습 설정
 
@@ -53,6 +76,7 @@ It is a truth universally acknowledged ...
 | Training rounds | 100 |
 | Maximum steps per round | 300 |
 | Random seed | 1337 |
+| Loss function | Cross-entropy loss |
 
 ## 5. 학습 결과
 
@@ -62,9 +86,21 @@ It is a truth universally acknowledged ...
 | Epoch 99 train loss | **1.1061** |
 | Loss 감소량 | **1.5564** |
 
-Train loss가 2.6625에서 1.1061로 전반적으로 감소했습니다. 이는 모델이 데이터셋의 문자 배열, 영어 단어 형태, 띄어쓰기, 구두점 및 대화문 패턴을 학습했음을 보여줍니다.
+Train loss가 2.6625에서 1.1061로 전반적으로 감소했습니다. 
 
-이 과제에서는 수업 노트북의 학습 방식을 유지하여 **train loss**를 결과로 제시했습니다. 별도의 validation loss는 계산하지 않았습니다.
+```text
+epoch  0 | train loss 2.6625
+epoch  1 | train loss 2.2340
+epoch  2 | train loss 1.9666
+...
+epoch 97 | train loss 1.1109
+epoch 98 | train loss 1.1082
+epoch 99 | train loss 1.1061
+```
+
+이 결과는 모형이 학습 데이터에서 다음 문자를 예측하는 능력을 점차 개선했음을 보여줍니다.
+
+Notebook 06의 학습 방식을 유지하여 **train loss**를 결과로 제시했습니다. 별도의 validation loss 평가는 수행하지 않았습니다.
 
 ## 6. 생성 결과
 
@@ -80,47 +116,41 @@ Elizabeth herself out Jane himself to be sure. The warmth of Elizabeth
 
 A restraint benefit of the all. The hint ill are to what had longerness in
 summer; for, that they were knowledged to conciliation of whom he
-can communicate is to Mr. Bingley’s being just can boaster.” ...
+can communicate is to Mr. Bingley’s being just can boaster.”
+
+“I had it because he spairs?”
+
+“In what a man treat proper pleasure still more calculativing was slightly awakened very particularly affordship’s consent condescers,” said he, and be perfectly with
+the entrance of grap
 ```
 
-전체 생성 결과는 [`generated_sample.txt`](generated_sample.txt)와 노트북의 마지막 출력에서 확인할 수 있습니다.
+생성 결과에는 `Elizabeth`, `Jane`, `Mr. Bingley`와 같은 인물명, 영어 단어 형태, 따옴표, 대화문 및 소설식 문장 패턴이 나타납니다. 이는 모형이 원문의 문자 배열과 지역적인 문체 패턴을 학습했다는 것을 보여줍니다.
 
-생성 문장은 영어 단어와 대화문·구두점 패턴을 보이지만, 긴 문맥의 문법적·의미적 일관성은 완전하지 않습니다. 또한 `[Illustration]`, 저작권 관련 문구가 나타났는데, 이는 원본 Project Gutenberg 텍스트에 포함된 편집·삽화 표기를 모델이 함께 학습했기 때문입니다.
+반면 `longerness`, `spairs`, `calculativing`처럼 실제 영어에서 부자연스러운 단어와 의미가 매끄럽게 이어지지 않는 문장도 생성되었습니다. 이는 문자 단위의 작은 모형, 64자의 짧은 context length, 단일 소설 학습이라는 조건에서 예상할 수 있는 한계입니다.
 
-## 7. 실행 방법
+출력에 `[Illustration]`이 나타난 것은 Project Gutenberg 원문 내부의 삽화 표기를 모형이 함께 학습했기 때문입니다. 마지막 문장이 `grap`에서 끝난 것은 오류가 아니라, 생성 길이를 500자로 제한했기 때문입니다.
 
-Google Colab에서 다음 순서로 실행합니다.
+---
 
-1. `GPT_2_0_Pride_and_Prejudice.ipynb`를 Colab에서 엽니다.
-2. `런타임 → 런타임 유형 변경 → GPU`를 선택합니다.
-3. `런타임 → 모두 실행`을 선택합니다.
-4. 학습이 끝나면 epoch별 train loss와 생성 텍스트를 확인합니다.
+## 7. 한계
 
-노트북 안의 다음 코드가 데이터셋을 자동으로 내려받습니다.
+- 문자 단위 tokenization을 사용하였기에 BPE나 subword tokenizer보다 비효율적임.
+- 한 권의 소설만 학습했기 때문에 일반적인 영어 생성 능력이 제한적임.
+- Context length가 64자로 짧아 긴 문맥을 안정적으로 유지하기 어려움.
+- Train loss만 측정했으므로 학습하지 않은 데이터에 대한 일반화 성능은 별도로 검증하지 않음.
+- 생성 결과는 문장 형태를 흉내낼 수 있지만 문법적 정확성, 일관성 또는 의미적 일관성을 보장하지 않음을 확인함.
 
-```python
-!wget -q -O input.txt https://www.gutenberg.org/cache/epub/1342/pg1342.txt
-```
+## 8. 참고 및 출처
 
-## 8. 한계
-
-- 문자 단위 모델이므로 BPE나 subword tokenizer보다 비효율적입니다.
-- 한 권의 소설만 학습했기 때문에 일반적인 영어 생성 능력이 제한적입니다.
-- Context length가 64자로 짧아 긴 문맥을 안정적으로 유지하기 어렵습니다.
-- Train loss만 측정했으므로 학습하지 않은 데이터에 대한 일반화 성능은 별도로 검증하지 않았습니다.
-- 생성 결과는 그럴듯한 문장 형식을 보일 수 있지만 사실성이나 의미적 일관성을 보장하지 않습니다.
-
-## 9. 참고 및 출처
-
-- 수업에서 제공된 Notebook 1–6
+- Learnus 수업 자료로 제공된 Notebook 1–6
 - Andrej Karpathy, [Neural Networks: Zero to Hero](https://github.com/karpathy/nn-zero-to-hero)
 - Jane Austen, [*Pride and Prejudice*, Project Gutenberg eBook #1342](https://www.gutenberg.org/ebooks/1342)
 
-## 10. 본 과제에서 변경한 내용
+## 9. 변경한 내용
 
 - Tiny Shakespeare를 *Pride and Prejudice*로 교체
-- Project Gutenberg 본문 구간 추출
+- Project Gutenberg 텍스트 자동 다운로드 코드 추가
+- Gutenberg 안내문을 제외하고 소설 본문 구간 추출
 - 데이터셋에 맞게 character vocabulary 재생성
-- `Elizabeth`를 prompt로 사용해 500자 생성
-- 100회 학습 결과 및 생성 결과 기록
-- 데이터셋, 모델 구조, 학습 설정, 결과와 한계 설명 추가
+- 생성 시작 문구를 'ROMEO:'에서 `Elizabeth`로 변경, prompt로 사용해 500자 생성
+- 100회 학습 결과 및 500자 생성 결과 기록
