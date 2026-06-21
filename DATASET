@@ -1,8 +1,0 @@
-Title: Pride and Prejudice
-Author: Jane Austen
-Source: https://www.gutenberg.org/ebooks/1342
-Format: Plain Text UTF-8
-Preprocessing:
-- Removed the Project Gutenberg header and license footer.
-- Retained the main novel text.
-- Saved as UTF-8 input.txt.
